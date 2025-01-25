@@ -1,0 +1,29 @@
+[project]
+name = 'clarity-stacks'
+description = ''
+authors = []
+telemetry = false
+cache_dir = './.cache'
+requirements = []
+[contracts.clarity-stacks]
+path = 'contracts/clarity-stacks.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.clarity-stacks-helper]
+path = 'contracts/clarity-stacks-helper.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.code-body-prover]
+path = 'contracts/code-body-prover.clar'
+clarity_version = 3
+epoch = 3.1
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
