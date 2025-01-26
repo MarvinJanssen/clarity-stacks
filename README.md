@@ -83,7 +83,7 @@ A minimal TypeScript library to make using the clarity-stacks library a bit easi
 Feed it a list of transaction IDs and it will construct a Stacks-compatible merkle tree for you.
 
 ```ts
-const tree = MerkleTree::new([txid1, txid2, txid3, txid4]);
+const tree = MerkleTree.new([txid1, txid2, txid3, txid4]);
 const root = tree.root(); // get the merkle root
 const proof = tree.proof(0); // generate a proof for txid1
 ```
