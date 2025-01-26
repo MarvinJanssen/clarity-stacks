@@ -62,3 +62,7 @@
 		(ok (sha512/256 (concat block-hash consensus-hash)))
 	)
 )
+
+(define-read-only (string-ascii-to-buffer (str (string-ascii 16000)))
+	(unwrap-panic (slice? (unwrap-panic (to-consensus-buff? str)) u5 (+ (len str) u5)))
+)

@@ -42,10 +42,11 @@ Use `is-contract-deployed`, it returns `(ok true)` if the transaction was mined.
 
 ### clarity-stacks-helper
 
-Contains helper functions to calculate block hashes that check the length of the inputs:
+Contains helper functions that contracts can use:
 
 - `block-header-hash`: calculates the block header hash.
 - `block-id-header-hash`: calculates the block ID.
+- `string-ascii-to-buffer`: convert a string-ascii to a buffer.
 
 ## Merkle proof
 
