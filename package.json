@@ -18,6 +18,7 @@
   "homepage": "https://github.com/MarvinJanssen/clarity-stacks#readme",
   "dependencies": {
     "@hirosystems/clarinet-sdk": "^2.3.2",
+    "@noble/hashes": "^1.7.1",
     "@stacks/transactions": "^6.12.0",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.3.3",
