@@ -69,7 +69,7 @@
 (define-public (debug-set-block-header-hash (stx-height uint) (header-hash (buff 32)))
 	(begin
 		(asserts! debug-mode (err u1))
-        ;; #[allow(unchecked_data)]
+		;; #[allow(unchecked_data)]
 		(ok (map-set debug-block-header-hashes stx-height header-hash))
 	)
 )
