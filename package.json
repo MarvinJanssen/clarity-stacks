@@ -1,5 +1,5 @@
 {
-  "name": "clarity-stacks-tests",
+  "name": "clarity-stacks",
   "version": "1.0.0",
   "description": "clarity-stacks, a library to check if a Stacks transaction was mined in Clarity.",
   "type": "module",
