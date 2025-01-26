@@ -14,7 +14,7 @@
 
 (define-map debug-block-header-hashes uint (buff 32))
 (define-constant debug-mode true)
-(asserts! (and debug-mode (not is-in-mainnet)) (err "Debug mode on mainnet is not allowed"))
+(and debug-mode (asserts! (not is-in-mainnet) (err "Debug mode on mainnet is not allowed")))
 (print (if debug-mode "Debug mode enabled" "Debug mode disabled"))
 
 (define-read-only (tagged-hash (tag (buff 1)) (data (buff 64)))
