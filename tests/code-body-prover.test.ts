@@ -13,7 +13,7 @@ import {
 		block_header_hash,
 		merkle_tree_from_txs,
 		parse_raw_nakamoto_block,
-		proof_path_to_cv,
+		proof_cv,
 	raw_block_header
 } from "../src/clarity-stacks.ts";
 
@@ -144,8 +144,7 @@ describe("code-body-prover.clar", () => {
 		simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(1), bufferCV(mock_block_header_hash)], address1);
 
 		// deploy tx proof
-		const proof = merkle_tree.proof(0);
-		const proofCV = proof_path_to_cv(0, proof, 1);
+		const proofCV = proof_cv(0, merkle_tree);
 
 		response = simnet.callReadOnlyFn(
 			"code-body-prover",

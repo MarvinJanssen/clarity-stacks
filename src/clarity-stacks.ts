@@ -120,6 +120,10 @@ export class MerkleTree {
         return this.nodes[this.nodes.length - 1][0];
     }
 
+    depth(): number {
+        return this.nodes.length - 1;
+    }
+
     pretty_print(): string {
         let str = '';
         for (let level = this.nodes.length-1 ; level >= 0 ; --level) {
@@ -163,6 +167,10 @@ export function proof_path_to_cv(tx_index: number, hashes: Uint8Array[], tree_de
         "hashes": listCV(hashes.map(bufferCV)),
         "tree-depth": uintCV(tree_depth)
     });
+}
+
+export function proof_cv(tx_index: number, merkle_tree: MerkleTree) {
+    return proof_path_to_cv(tx_index, merkle_tree.proof(tx_index), merkle_tree.depth());
 }
 
 export async function fetch_raw_nakamoto_block(height: number, block_api?: string): Promise<Uint8Array> {

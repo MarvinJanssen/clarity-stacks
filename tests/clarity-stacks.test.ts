@@ -27,20 +27,23 @@ describe("clarity-stacks.ts", () => {
 	it('Check that the expected merkle tree is equal to the calculated merkle tree', () => {
 		const merkle_tree = merkle_tree_from_txs(block.transactions);
 		const calculated_merkle_root = merkle_tree.root();
+		const depth = merkle_tree.depth();
 		expect(calculated_merkle_root).toEqual(block.tx_merkle_root);
+		expect(depth).toEqual(1);
 	});
 });
 
 describe("clarity-stacks.clar", () => {
 	it("Can verify that transaction 0 of block 438,372 was mined", () => {
 		simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
+		const tx_index = 0;
 		const merkle_tree = merkle_tree_from_txs(block.transactions);
-		const proof = merkle_tree.proof(0);
-		const proofCV = proof_path_to_cv(0, proof, 1);
+		const proof = merkle_tree.proof(tx_index);
+		const proofCV = proof_path_to_cv(tx_index, proof, merkle_tree.depth());
 		const response = simnet.callReadOnlyFn(
 			"clarity-stacks",
 			"was-tx-mined-compact",
-			[bufferCV(hexToBytes(block.transactions[0].txid())), proofCV, uintCV(438372), bufferCV(raw_block_header(block))],
+			[bufferCV(hexToBytes(block.transactions[tx_index].txid())), proofCV, uintCV(438372), bufferCV(raw_block_header(block))],
 			address1
 		);
 		expect(response.result).toBeOk(boolCV(true));
@@ -48,13 +51,14 @@ describe("clarity-stacks.clar", () => {
 
 	it("Can verify that transaction 1 of block 438,372 was mined", () => {
 		simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
+		const tx_index = 1;
 		const merkle_tree = merkle_tree_from_txs(block.transactions);
-		const proof = merkle_tree.proof(1);
-		const proofCV = proof_path_to_cv(1, proof, 1);
+		const proof = merkle_tree.proof(tx_index);
+		const proofCV = proof_path_to_cv(tx_index, proof, merkle_tree.depth());
 		const response = simnet.callReadOnlyFn(
 			"clarity-stacks",
 			"was-tx-mined-compact",
-			[bufferCV(hexToBytes(block.transactions[1].txid())), proofCV, uintCV(438372), bufferCV(raw_block_header(block))],
+			[bufferCV(hexToBytes(block.transactions[tx_index].txid())), proofCV, uintCV(438372), bufferCV(raw_block_header(block))],
 			address1
 		);
 		expect(response.result).toBeOk(boolCV(true));

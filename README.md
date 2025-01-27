@@ -94,8 +94,10 @@ const proof = tree.proof(0); // generate a proof for txid1
 Construct a merkle tree as above, then use the helper function:
 
 ```ts
+const tx_index = 0;
+const tree_depth = tree.depth();
 const proof = tree.proof(0);
-const proofCV = proof_path_to_cv(0, proof, 2); // tx_index, proof, tree depth
+const proofCV = proof_path_to_cv(tx_index, proof, tree_depth);
 ```
 
 ### Fetching and preparing block headers
