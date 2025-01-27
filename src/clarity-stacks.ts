@@ -121,6 +121,9 @@ export class MerkleTree {
     }
 
     depth(): number {
+        if (this.nodes.length === 0) {
+            return 0;
+        }
         return this.nodes.length - 1;
     }
 
