@@ -1,7 +1,7 @@
 import { sha512_256 } from '@noble/hashes/sha512';
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { bufferCV, BytesReader, deserializeTransaction, listCV, tupleCV, uintCV } from '@stacks/transactions';
-import type { StacksTransaction, TupleCV } from '@stacks/transactions';
+import { StacksTransaction, TupleCV } from '@stacks/transactions';
 
 export const NAKAMOTO_SIGNER_SIGNATURE_LENGTH = 65;
 
@@ -137,8 +137,14 @@ export class MerkleTree {
     }
 }
 
-export function merkle_tree_from_txs(txs: StacksTransaction[]): MerkleTree {
-    return MerkleTree.new(txs.map(tx => hexToBytes(tx.txid())));
+export function merkle_tree_from_txs(txs: (StacksTransaction| Uint8Array)[]): MerkleTree {
+    return MerkleTree.new(txs.map((tx:StacksTransaction| Uint8Array) => {
+        if (tx instanceof StacksTransaction){
+            return hexToBytes(tx.txid());
+        } else {
+            return tx;
+        }
+    }));
 }
 
 export function block_header_hash(block: NakamotoBlockStruct): Uint8Array {
