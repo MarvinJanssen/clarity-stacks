@@ -35,7 +35,7 @@ describe("clarity-stacks.ts", () => {
 
 describe("clarity-stacks.clar", () => {
 	it("Can verify that transaction 0 of block 438,372 was mined", () => {
-		simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
+		//simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
 		const tx_index = 0;
 		const merkle_tree = merkle_tree_from_txs(block.transactions);
 		const proof = merkle_tree.proof(tx_index);
@@ -50,7 +50,7 @@ describe("clarity-stacks.clar", () => {
 	});
 
 	it("Can verify that transaction 1 of block 438,372 was mined", () => {
-		simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
+		//simnet.callPublicFn("clarity-stacks", "debug-set-block-header-hash", [uintCV(438372), bufferCV(expected_block_header_hash)], address1);
 		const tx_index = 1;
 		const merkle_tree = merkle_tree_from_txs(block.transactions);
 		const proof = merkle_tree.proof(tx_index);
