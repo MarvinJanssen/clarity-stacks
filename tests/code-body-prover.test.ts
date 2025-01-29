@@ -1,33 +1,40 @@
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
-import { boolCV,
-	bufferCV,
-	bufferCVFromString,
-	contractPrincipalCV,
-	createAssetInfo,
-	createStacksPublicKey,
-	FungibleConditionCode,
-	makeContractDeploy,
-	makeStandardFungiblePostCondition,
-	makeSTXTokenTransfer,
-	makeUnsignedContractDeploy,
-	PostConditionMode,
-	pubKeyfromPrivKey,
-	SingleSigSpendingCondition,
-	uintCV,
-	UnsignedContractDeployOptions
+import {
+  AddressVersion,
+  boolCV,
+  bufferCV,
+  bufferCVFromString,
+  contractPrincipalCV,
+  createAssetInfo,
+  createStacksPublicKey,
+  cvToString,
+  FungibleConditionCode,
+  makeContractDeploy,
+  makeStandardFungiblePostCondition,
+  makeSTXTokenTransfer,
+  makeUnsignedContractDeploy,
+  PostConditionMode,
+  pubKeyfromPrivKey,
+  publicKeyToAddress,
+  serializeCV,
+  SingleSigSpendingCondition,
+  uintCV,
+  UnsignedContractDeployOptions,
 } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import {
-		block_header_hash,
-		merkle_tree_from_txs,
-		parse_raw_nakamoto_block,
-		proof_cv,
-	raw_block_header
+  block_header_hash,
+  fetch_nakamoto_block_struct,
+  merkle_tree_from_txs,
+  parse_raw_nakamoto_block,
+  proof_cv,
+  raw_block_header,
 } from "../src/clarity-stacks.ts";
-import { CODE_BODY } from "./code-body.ts";
+import { CODE_BODY, TX_HEX } from "./data-deploy-tx.ts";
 
 const accounts = simnet.getAccounts();
-const deployer_secret = '753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601';
+const deployer_secret =
+  "753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601";
 const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
 const address2 = accounts.get("wallet_2")!;
@@ -270,4 +277,89 @@ describe("code-body-prover.clar", () => {
 
 		expect(response.result).toBeOk(boolCV(true));
 	});
+  it("Can verify that agp441 contract was deployed at block 516,259", async () => {
+    const contract = "SP1E0XBN9T4B10E9QMR7XMFJPMA19D77WY3KP2QKC.agp441";
+    const tx_id =
+      "d04091fae9b483e9dd787340e9a56eede3bd4e5e3790109da30dbffa2c4c1620";
+    const tx_nonce = 190;
+    const tx_fee = 500002;
+    const block_height = 516259;
+    const tx_index = 1;
+
+    const [contract_address, contract_name] = contract.split(".");
+
+    const signature = hexToBytes(TX_HEX.slice(90, 90 + 130));
+
+    let hex: string = "";
+    const tx_nonce_bytes = new Uint8Array(8);
+    hex = tx_nonce.toString(16);
+    hexToBytes(hex.padStart(16, "0")).forEach(
+      (v, i) => (tx_nonce_bytes[i] = v)
+    );
+    //console.log(bytesToHex(tx_nonce_bytes));
+
+    const tx_fee_bytes = new Uint8Array(8);
+    hex = tx_fee.toString(16);
+    hexToBytes(hex.padStart(16, "0")).forEach((v, i) => (tx_fee_bytes[i] = v));
+    //console.log(bytesToHex(tx_fee_bytes));
+
+    const code_body_bytes = new TextEncoder().encode(CODE_BODY);
+
+    const responseTxId = simnet.callReadOnlyFn(
+      "code-body-prover",
+      "calculate-txid",
+      [
+        bufferCV(tx_nonce_bytes),
+        bufferCV(tx_fee_bytes),
+        bufferCV(signature),
+        contractPrincipalCV(contract_address, contract_name),
+        bufferCV(code_body_bytes),
+      ],
+      address1
+    );
+
+    expect(responseTxId.result).toBeOk(bufferCV(hexToBytes(tx_id)));
+
+    const block = await fetch_nakamoto_block_struct(block_height);
+    console.log(
+      cvToString(
+        simnet.callReadOnlyFn(
+          "clarity-stacks",
+          "get-block-info-header-hash?",
+          [uintCV(block_height)],
+          deployer
+        ).result
+      )
+    );
+    const merkle_tree = merkle_tree_from_txs([
+      hexToBytes(
+        "6d5299ef7c9251ee09ed34ebfafb3aac03c7c4209134eb055169fa1c55cdd0a2"
+      ),
+      hexToBytes(tx_id),
+      hexToBytes(
+        "d4a8cc0f8f471795cd2bb170d8843d41ba121baf032080bd2fb5e5e5c08d5e1d"
+      ),
+    ]);
+
+    // deploy tx proof
+    const proofCV = proof_cv(tx_index, merkle_tree);
+
+    const response = simnet.callReadOnlyFn(
+      "code-body-prover",
+      "is-contract-deployed",
+      [
+        bufferCV(tx_nonce_bytes),
+        bufferCV(tx_fee_bytes),
+        bufferCV(signature),
+        contractPrincipalCV(contract_address, contract_name),
+        bufferCV(code_body_bytes),
+        proofCV,
+        uintCV(block_height),
+        bufferCV(raw_block_header(block)),
+      ],
+      address1
+    );
+
+    expect(response.result).toBeOk(boolCV(true));
+  });
 });

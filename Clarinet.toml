@@ -32,4 +32,4 @@ callee_filter = false
 [repl.remote_data]
 enabled = true
 api_url = "http://api.hiro.so"
-initial_height = 438373
+initial_height = 516259        #438372
