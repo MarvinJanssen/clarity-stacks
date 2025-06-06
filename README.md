@@ -6,6 +6,10 @@ Inspired by the excellent [clarity-bitcoin](https://github.com/friedger/clarity-
 
 With thanks to @Friedger.
 
+> [!WARNING]
+> Note that this library can verify that a transaction was included in a block, but it does not provide any information about the result of the transaction.
+> A failing transaction included in a block is not differentiated from a successful transaction in this library.
+
 ## Why?
 
 Why not? In all seriousness, this library allows you to check if a specific transaction has been mined in a Stacks block in Clarity. It is particularly useful to prove if a given contract has a specific code body. Since there is no Clarity function to fetch a transaction nor to read a contract code body, this is the next best thing.
