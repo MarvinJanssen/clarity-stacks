@@ -7,14 +7,29 @@ Inspired by the excellent [clarity-bitcoin](https://github.com/friedger/clarity-
 With thanks to @Friedger.
 
 > [!WARNING]
-> Note that this library can verify that a transaction was included in a block, but it does not provide any information about the result of the transaction.
-> A failing transaction included in a block is not differentiated from a successful transaction in this library.
+> This library must be used with care. Read the section below before including it in a project.
 
-## Why?
+## WARNING: read before using
+
+The library allows you to prove a specific Stacks transaction was mined in a block. The code bode prover is a helper contract that makes it easier for you to verify that a contract deploy transaction (with a specific code body) was *mined*. Transactions that fail to execute can still be mined in blocks.
+
+There is no way to differentiate between successful transactions and those that failed to execute. If you use the library to verify contract deploy transactions then you must ensure that these contracts cannot fail to deploy.
+
+Contract deployments may fail if their top level code fails to execute. When that happens, the contract itself does not materialise on Stacks and the contract address remains available. The deployer may at a later stage deploy a different contract at the same contract address. However, they can use the failed deployment transaction in a proof. Remember, the library verifies a transaction was *mined*, not that it was *executed successfully*.
+
+If you rely on this library to verify contract code bodies, then you must make sure that the contract code cannot conditionally fail to deploy. Here are some examples that may cause it to fail:
+
+- A top level assertion that relies on some changing state.
+- Reliance on a downstream contract (via `contract-call?`) that may not be deployed.
+- Assets are moved for which post conditions are necessary.
+
+And there might be others! You must verify your code.
+
+## Why prove Stacks transactions?
 
 Why not? In all seriousness, this library allows you to check if a specific transaction has been mined in a Stacks block in Clarity. It is particularly useful to prove if a given contract has a specific code body. Since there is no Clarity function to fetch a transaction nor to read a contract code body, this is the next best thing.
 
-The inability to deploy a contract from an existing contract is sometimes a limiting factor for protocols. Whilst this library does not provide such a feature, it does allow a protocol to accept a contract deployed by a third-party by verifying if the code body is as it expects.
+The inability to deploy a contract from an existing contract is sometimes a limiting factor for protocols. Whilst this library does not provide such a feature, it does allow a protocol to accept a contract deployed by a third-party by verifying the code in the deploy transaction.
 
 ## Clarity functions
 
@@ -33,7 +48,7 @@ Use `was-tx-mined-compact`, it returns `(ok true)` if the transaction was mined.
 
 Stateless contract that verifies if a contract with a specific code body was mined in a block.
 
-Use `is-contract-deployed`, it returns `(ok true)` if the transaction was mined. It takes the following parameters:
+Use `was-contract-deploy-tx-mined`, it returns `(ok true)` if the transaction was mined. It takes the following parameters:
 
 - `nonce`: tx nonce as an 8-byte buffer
 - `fee`: tx fee as an 8-byte buffer
@@ -123,10 +138,4 @@ There are some, mainly to illustrate how to use the Clarity and TypeScript libra
 
 ## Future developments
 
-The library requires information that the Stacks chain already knows to be submitted, like the block header, transaction IDs, and so on. It makes the library wasteful in that sense. A Clarity function that fetches a code body or returns a hash of a code body would make the library redundant. If you like this library, then consider voicing your support for such a feature.
-
-```clarity
-(get-code-body 'SP123....my-contract)
-(get-code-body-sha256 'SP123....my-contract)
-```
-
+The library requires information that the Stacks chain already knows to be submitted, like the block header, transaction IDs, and so on. It makes the library wasteful in that sense. A Clarity function that fetches a code body or returns a hash of a code body would make the library redundant. If you like this library, then consider [supporting this feature request](https://github.com/clarity-lang/reference/issues/88).
