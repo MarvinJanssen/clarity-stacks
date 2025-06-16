@@ -70,7 +70,7 @@
 )
 
 ;; Returns (ok true) if the transaction was mined.
-(define-read-only (is-contract-deployed
+(define-read-only (was-contract-deploy-tx-mined
 	(nonce (buff 8))
 	(fee (buff 8))
 	(signature (buff 65))

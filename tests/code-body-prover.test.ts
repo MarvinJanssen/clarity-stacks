@@ -148,7 +148,7 @@ describe("code-body-prover.clar", () => {
 
 		response = simnet.callReadOnlyFn(
 			"code-body-prover",
-			"is-contract-deployed",
+			"was-contract-deploy-tx-mined",
 			[
 				bufferCV(tx_nonce_bytes),
 				bufferCV(tx_fee_bytes),
